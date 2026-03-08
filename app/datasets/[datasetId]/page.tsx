@@ -30,7 +30,8 @@ type Suggestions = {
   suggestions: string[];
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8100/api/v1/datasets";
+const API_HOST = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8100").replace(/\/$/, "");
+const DATASETS_BASE = `${API_HOST}/api/v1/datasets`;
 
 export default function DatasetPage({ params }: { params: { datasetId: string } }) {
   const datasetId = params.datasetId;
@@ -76,7 +77,7 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
           params.append("filter_column", previewFilterColumn);
           params.append("filter_value", previewFilterValue);
         }
-        const res = await fetch(`${API_BASE}/${datasetId}/rows?${params.toString()}`);
+        const res = await fetch(`${DATASETS_BASE}/${datasetId}/rows?${params.toString()}`);
         if (!res.ok) throw new Error(`Preview failed (${res.status})`);
         const data = (await res.json()) as Preview;
         if (mounted) {
@@ -94,7 +95,7 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
     const loadSuggestions = async () => {
       if (!datasetId) return;
       try {
-        const res = await fetch(`${API_BASE}/${datasetId}/suggestions`);
+        const res = await fetch(`${DATASETS_BASE}/${datasetId}/suggestions`);
         if (!res.ok) throw new Error(`Suggestions failed (${res.status})`);
         const data = (await res.json()) as Suggestions;
         if (mounted) setSuggestions(data.suggestions || []);
@@ -118,7 +119,7 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
     setChatHistory((prev) => [...prev, { role: "user", text: userMessage }]);
     setQuestion(""); // clear input immediately
     try {
-      const res = await fetch(`${API_BASE}/${datasetId}/query`, {
+      const res = await fetch(`${DATASETS_BASE}/${datasetId}/query`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 
 type DatasetItem = { id: string; name: string; status: string };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8100/api/v1/datasets";
+const API_HOST = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8100").replace(/\/$/, "");
+const DATASETS_BASE = `${API_HOST}/api/v1/datasets`;
 
 export default function Home() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function Home() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(API_BASE);
+        const res = await fetch(DATASETS_BASE);
         if (!res.ok) throw new Error(`Failed to load datasets (${res.status})`);
         const data = (await res.json()) as DatasetItem[];
         setDatasets(data);
@@ -72,7 +73,7 @@ export default function Home() {
                 try {
                   const form = new FormData();
                   form.append("file", file);
-                  const res = await fetch(`${API_BASE}/upload`, {
+                  const res = await fetch(`${DATASETS_BASE}/upload`, {
                     method: "POST",
                     body: form,
                   });
