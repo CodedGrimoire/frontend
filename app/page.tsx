@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 type DatasetItem = { id: string; name: string; status: string };
 
-const API_BASE = "http://localhost:8100/api/v1/datasets";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8100/api/v1/datasets";
 
 export default function Home() {
   const router = useRouter();

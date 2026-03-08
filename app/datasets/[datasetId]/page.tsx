@@ -30,7 +30,7 @@ type Suggestions = {
   suggestions: string[];
 };
 
-const API_BASE = "http://localhost:8100/api/v1/datasets";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8100/api/v1/datasets";
 
 export default function DatasetPage({ params }: { params: { datasetId: string } }) {
   const datasetId = params.datasetId;
