@@ -42,3 +42,20 @@ body {
   max-width: 100%;
   overflow-x: auto;
 }
+
+.suggestions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.suggestion-pill {
+  width: 100%;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  padding: 8px 12px;
+  border-radius: 8px;
+}

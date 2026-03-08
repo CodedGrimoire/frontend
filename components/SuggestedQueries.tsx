@@ -14,16 +14,16 @@ const fallbackSuggestions = [
 ];
 
 export default function SuggestedQueries({ onSelect, suggestions }: Props) {
-  const list = (suggestions && suggestions.length > 0 ? suggestions : fallbackSuggestions).slice(0, 4);
+  const list = (suggestions && suggestions.length > 0 ? suggestions : fallbackSuggestions).slice(0, 3);
   return (
-    <div className="space-y-2">
+    <div className="suggestions-container space-y-2 w-full">
       <div className="text-sm text-slate-300">Try asking DataPilot:</div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 w-full">
         {list.map((s) => (
           <button
             key={s}
             onClick={() => onSelect(s)}
-            className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-slate-100 hover:bg-cyan-500/20 transition"
+            className="suggestion-pill bg-white/5 border border-white/10 text-sm text-slate-100 hover:bg-cyan-500/20 transition text-left"
           >
             {s}
           </button>

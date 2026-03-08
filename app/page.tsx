@@ -2,16 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type DatasetItem = { id: string; name: string; status: string };
 
 const API_BASE = "http://localhost:8100/api/v1/datasets";
 
 export default function Home() {
+  const router = useRouter();
   const [datasets, setDatasets] = useState<DatasetItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const username = "User"; // placeholder; plug in auth user when available
+  const [fileInputKey, setFileInputKey] = useState(Date.now()); // reset file input after use
 
   useEffect(() => {
     const load = async () => {
@@ -39,14 +43,54 @@ export default function Home() {
             Pick a dataset to open your DataPilot workspace. You can chat with your data, view answers, and preview the
             full table with sorting, filtering, and pagination.
           </p>
+          {uploading && (
+            <div className="text-slate-300 text-sm">Uploading and converting to SQL…</div>
+          )}
         </div>
 
         <div className="md:w-1/2 space-y-4">
           <div className="text-lg font-semibold text-slate-100">Your datasets</div>
           <div className="flex items-center gap-3">
-            <button className="px-3 py-2 rounded-lg bg-accent text-slate-900 font-semibold shadow-card hover:brightness-95">
-              + Add New
+            <button
+              className="px-3 py-2 rounded-lg bg-accent text-slate-900 font-semibold shadow-card hover:brightness-95 disabled:opacity-60"
+              disabled={uploading}
+              onClick={() => document.getElementById("file-upload-input")?.click()}
+            >
+              {uploading ? "Processing…" : "+ Add New"}
             </button>
+            <input
+              id="file-upload-input"
+              key={fileInputKey}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setUploading(true);
+                setError(null);
+                try {
+                  const form = new FormData();
+                  form.append("file", file);
+                  const res = await fetch(`${API_BASE}/upload`, {
+                    method: "POST",
+                    body: form,
+                  });
+                  if (!res.ok) {
+                    const detail = await res.json().catch(() => ({}));
+                    throw new Error(detail.detail || `Upload failed (${res.status})`);
+                  }
+                  const data = await res.json();
+                  const newId = data.dataset_id;
+                  router.push(`/datasets/${newId}`);
+                } catch (err) {
+                  setError((err as Error).message);
+                } finally {
+                  setUploading(false);
+                  setFileInputKey(Date.now());
+                }
+              }}
+            />
           </div>
           {error && <div className="glass-card p-3 border border-rose-500/40 text-rose-100 text-sm">{error}</div>}
           {loading ? (
