@@ -1,173 +1,83 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import AnswerCard from "../components/AnswerCard";
-import ResultTable from "../components/ResultTable";
-import SQLViewer from "../components/SQLViewer";
-import ChatPanel from "../components/ChatPanel";
-import PreviewTable from "../components/PreviewTable";
-import ChartRenderer from "../components/ChartRenderer";
 
-type Column = { name: string; type: string };
-type QueryResult = {
-  type: string;
-  sql: string;
-  rows: Array<Record<string, unknown>>;
-  columns: Column[];
-  row_count: number;
-  answer?: string | null;
-};
+type DatasetItem = { id: string; name: string; status: string };
 
-type Preview = {
-  columns: Column[];
-  rows: Array<Record<string, unknown>>;
-};
+const API_BASE = "http://localhost:8100/api/v1/datasets";
 
-type Suggestions = {
-  suggestions: string[];
-};
-
-const DATASET_ID = "9a087fbe-52f6-4644-92fc-d0353d064681";
-const API_URL = `http://localhost:8100/api/v1/datasets/${DATASET_ID}/query`;
-const PREVIEW_URL = `http://localhost:8100/api/v1/datasets/${DATASET_ID}/preview`;
-const SUGGEST_URL = `http://localhost:8100/api/v1/datasets/${DATASET_ID}/suggestions`;
-
-export default function Page() {
-  const [question, setQuestion] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function Home() {
+  const [datasets, setDatasets] = useState<DatasetItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<QueryResult | null>(null);
-  const [preview, setPreview] = useState<Preview>({ columns: [], rows: [] });
-  const [previewLoading, setPreviewLoading] = useState(true);
-  const [previewError, setPreviewError] = useState<string | null>(null);
-  const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; text: string }>>([
-    {
-      role: "assistant",
-      text: "Hi, I'm DataPilot. Ask me questions about your dataset and I'll generate SQL and insights for you."
-    }
-  ]);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [userTyped, setUserTyped] = useState(false);
+  const username = "User"; // placeholder; plug in auth user when available
 
-  // load dataset preview once
   useEffect(() => {
-    let mounted = true;
-    const loadPreview = async () => {
+    const load = async () => {
       try {
-        const res = await fetch(PREVIEW_URL);
-        if (!res.ok) throw new Error(`Preview failed (${res.status})`);
-        const data = (await res.json()) as Preview;
-        if (mounted) setPreview(data);
+        const res = await fetch(API_BASE);
+        if (!res.ok) throw new Error(`Failed to load datasets (${res.status})`);
+        const data = (await res.json()) as DatasetItem[];
+        setDatasets(data);
       } catch (err) {
-        console.error(err);
-        if (mounted) setPreviewError((err as Error).message || "Failed to load preview");
+        setError((err as Error).message);
       } finally {
-        if (mounted) setPreviewLoading(false);
+        setLoading(false);
       }
     };
-    loadPreview();
-    const loadSuggestions = async () => {
-      try {
-        const res = await fetch(SUGGEST_URL);
-        if (!res.ok) throw new Error(`Suggestions failed (${res.status})`);
-        const data = (await res.json()) as Suggestions;
-        if (mounted) setSuggestions(data.suggestions || []);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    loadSuggestions();
-    return () => {
-      mounted = false;
-    };
+    load();
   }, []);
 
-  const runQuery = async (prompt?: string) => {
-    const ask = (prompt ?? question).trim();
-    if (!ask) return;
-    const userMessage = ask;
-    setLoading(true);
-    setError(null);
-    setChatHistory((prev) => [...prev, { role: "user", text: userMessage }]);
-    setQuestion(""); // clear input immediately
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ question: userMessage })
-      });
-      if (!res.ok) {
-        const detail = await res.json().catch(() => ({}));
-        throw new Error(detail.detail || `Request failed (${res.status})`);
-      }
-      const data = (await res.json()) as QueryResult;
-      setResult(data);
-      setChatHistory((prev) => [
-        ...prev,
-        { role: "assistant", text: data.answer || "Query ran successfully." },
-      ]);
-    } catch (err: any) {
-      setResult(null);
-      setError(err.message || "Something went wrong");
-      setChatHistory((prev) => [...prev, { role: "assistant", text: `Error: ${err.message || "Something went wrong"}` }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <main className="h-screen w-screen overflow-hidden bg-surface text-slate-100">
-      <div className="h-full flex">
-        {/* Left: Chat */}
-        <section className="w-[20%] min-w-[260px] border-r border-slate-800 p-4 pt-10 flex flex-col">
-          <ChatPanel
-            messages={chatHistory}
-            input={question}
-            onChange={(val) => {
-              setQuestion(val);
-              setUserTyped(val.trim().length > 0);
-            }}
-            onSubmit={() => runQuery()}
-            loading={loading}
-            suggestions={suggestions.slice(0, 4)}
-            showSuggestions={!userTyped}
-            onSelectSuggestion={(text) => runQuery(text)}
-          />
-        </section>
+    <main className="min-h-screen bg-surface text-slate-100">
+      <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-10">
+        <div className="md:w-1/2 space-y-4">
+          <div className="text-sm uppercase tracking-[0.2em] text-accent">Welcome back</div>
+          <div className="text-3xl font-semibold text-slate-50">{username}</div>
+          <p className="text-slate-400">
+            Pick a dataset to open your DataPilot workspace. You can chat with your data, view answers, and preview the
+            full table with sorting, filtering, and pagination.
+          </p>
+        </div>
 
-        {/* Middle: Results */}
-        <section className="flex-1 border-r border-slate-800 p-4 pt-8 overflow-y-auto">
-          <div className="results-content">
-            {error && (
-              <div className="glass-card p-3 border border-rose-500/40 text-rose-100 text-sm">{error}</div>
-            )}
-            {result ? (
-              <>
-                <AnswerCard answer={result.answer} type={result.type} />
-                <div className="result-table">
-                  <ResultTable columns={result.columns || []} rows={result.rows || []} loading={loading} />
-                </div>
-                <ChartRenderer columns={result.columns || []} rows={result.rows || []} />
-                <div className="generated-sql">
-                  <SQLViewer sql={result.sql} />
-                </div>
-              </>
-            ) : (
-              <div className="glass-card p-4 text-slate-400 text-sm">Ask DataPilot a question to explore your dataset.</div>
-            )}
+        <div className="md:w-1/2 space-y-4">
+          <div className="text-lg font-semibold text-slate-100">Your datasets</div>
+          <div className="flex items-center gap-3">
+            <button className="px-3 py-2 rounded-lg bg-accent text-slate-900 font-semibold shadow-card hover:brightness-95">
+              + Add New
+            </button>
           </div>
-        </section>
-
-        {/* Right: Spreadsheet */}
-        <section className="w-[45%] min-w-[420px] p-4 pt-8 overflow-x-auto">
-          {previewError ? (
-            <div className="glass-card p-4 border border-rose-500/40 text-rose-100 text-sm">{previewError}</div>
+          {error && <div className="glass-card p-3 border border-rose-500/40 text-rose-100 text-sm">{error}</div>}
+          {loading ? (
+            <div className="grid gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="glass-card p-4 border border-white/10 animate-pulse">
+                  <div className="h-4 w-32 bg-white/10 rounded mb-2" />
+                  <div className="h-3 w-20 bg-white/10 rounded" />
+                </div>
+              ))}
+            </div>
+          ) : datasets.length === 0 ? (
+            <div className="glass-card p-4 text-slate-300">No datasets yet.</div>
           ) : (
-            <PreviewTable columns={preview.columns} rows={preview.rows} loading={previewLoading} />
+            <div className="grid gap-3">
+              {datasets.map((d) => (
+                <Link key={d.id} href={`/datasets/${d.id}`}>
+                  <div className="glass-card p-4 border border-white/10 hover:border-cyan-400/60 transition cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-base font-semibold text-slate-50">{d.name}</div>
+                        <div className="text-xs text-slate-400">Status: {d.status}</div>
+                      </div>
+                      <div className="text-sm text-cyan-300">Open →</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           )}
-        </section>
+        </div>
       </div>
     </main>
   );
