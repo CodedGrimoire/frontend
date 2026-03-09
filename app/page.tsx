@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 type DatasetItem = { id: string; name: string; status: string };
 
-const API_HOST = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8100").replace(/\/$/, "");
+const API_HOST = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000").replace(/\/$/, "");
 const DATASETS_BASE = `${API_HOST}/api/v1/datasets`;
 
 export default function Home() {
@@ -15,6 +15,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const username = "User"; // placeholder; plug in auth user when available
   const [fileInputKey, setFileInputKey] = useState(Date.now()); // reset file input after use
 
@@ -33,6 +34,24 @@ export default function Home() {
     };
     load();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm("Delete this dataset? This cannot be undone.");
+    if (!confirmDelete) return;
+    const doubleCheck = window.confirm("Are you absolutely sure? All data for this dataset will be removed.");
+    if (!doubleCheck) return;
+    setDeletingId(id);
+    setError(null);
+    try {
+      const res = await fetch(`${DATASETS_BASE}/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(`Delete failed (${res.status})`);
+      setDatasets((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-surface text-slate-100">
@@ -108,17 +127,31 @@ export default function Home() {
           ) : (
             <div className="grid gap-3">
               {datasets.map((d) => (
-                <Link key={d.id} href={`/datasets/${d.id}`}>
-                  <div className="glass-card p-4 border border-white/10 hover:border-cyan-400/60 transition cursor-pointer">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-base font-semibold text-slate-50">{d.name}</div>
-                        <div className="text-xs text-slate-400">Status: {d.status}</div>
-                      </div>
+                <div
+                  key={d.id}
+                  className="glass-card p-4 border border-white/10 hover:border-cyan-400/60 transition cursor-pointer"
+                  onClick={() => router.push(`/datasets/${d.id}`)}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-base font-semibold text-slate-50 truncate">{d.name}</div>
+                      <div className="text-xs text-slate-400">Status: {d.status}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="text-xs px-3 py-1 rounded-md bg-rose-500/80 hover:bg-rose-500 text-slate-50"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(d.id);
+                        }}
+                        disabled={deletingId === d.id}
+                      >
+                        {deletingId === d.id ? "Deleting..." : "Delete"}
+                      </button>
                       <div className="text-sm text-cyan-300">Open →</div>
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}
