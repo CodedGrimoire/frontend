@@ -55,24 +55,77 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-surface text-slate-100">
-      <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-10">
-        <div className="md:w-1/2 space-y-4">
-          <div className="text-sm uppercase tracking-[0.2em] text-accent">Welcome back</div>
-          <div className="text-3xl font-semibold text-slate-50">{username}</div>
-          <p className="text-slate-400">
-            Pick a dataset to open your DataPilot workspace. You can chat with your data, view answers, and preview the
-            full table with sorting, filtering, and pagination.
-          </p>
-          {uploading && (
-            <div className="text-slate-300 text-sm">Uploading and converting to SQL…</div>
-          )}
+      <div className="max-w-7xl mx-auto px-6 py-8 md:py-10 relative">
+        <div className="surface-panel soft-grid px-6 py-5 md:px-8 md:py-6 mb-8 flex items-center justify-between gap-4">
+          <div>
+            <div className="section-label mb-2">DataPivot AI</div>
+            <div className="text-2xl md:text-3xl font-semibold text-slate-50">Spreadsheet to SQL instantly.</div>
+          </div>
+          <div className="hidden md:flex items-center gap-3 text-sm text-slate-300">
+            <span className="pill-button px-4 py-2 rounded-full">Dashboard</span>
+            <span className="pill-button px-4 py-2 rounded-full">Workspaces</span>
+            <span className="pill-button px-4 py-2 rounded-full">Data Sources</span>
+          </div>
         </div>
 
-        <div className="md:w-1/2 space-y-4">
-          <div className="text-lg font-semibold text-slate-100">Your datasets</div>
-          <div className="flex items-center gap-3">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.9fr]">
+          <section className="surface-panel hero-glow p-8 md:p-10">
+            <div className="section-label mb-3">AI-Powered Data Transformation</div>
+            <div className="max-w-2xl text-4xl md:text-5xl font-semibold tracking-tight text-slate-50 leading-tight">
+              Build a professional AI query workspace without changing your current pipeline.
+            </div>
+            <p className="mt-5 max-w-2xl text-slate-300 text-base leading-7">
+              Pick a dataset to open your DataPilot workspace. Your existing natural-language query flow, SQL generation,
+              result rendering, charting, and dataset preview stay intact. This update only adds the product-style shell
+              and the darker indigo palette from your reference.
+            </p>
+            {uploading && <div className="mt-4 text-slate-300 text-sm">Uploading and converting to SQL…</div>}
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button
+                className="primary-button px-5 py-3 rounded-xl font-semibold disabled:opacity-60"
+                disabled={uploading}
+                onClick={() => document.getElementById("file-upload-input")?.click()}
+              >
+                {uploading ? "Processing…" : "Start Transforming"}
+              </button>
+              <button className="secondary-button px-5 py-3 rounded-xl font-medium" onClick={() => window.scrollTo({ top: 900, behavior: "smooth" })}>
+                View Workspace Modules
+              </button>
+            </div>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {[
+                ["Natural Language Queries", "Convert plain-English questions into optimized SQL against uploaded spreadsheets."],
+                ["Automatic Inference", "Detect schema patterns and prepare structures for analysis without losing your current flow."],
+                ["Instant API Generation", "Turn transformed data into a ready-to-use analytics workspace and service layer."]
+              ].map(([title, text]) => (
+                <div key={title} className="glass-card p-4">
+                  <div className="text-sm font-semibold text-slate-100">{title}</div>
+                  <div className="mt-2 text-sm text-slate-400 leading-6">{text}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="space-y-5">
+            <div className="surface-panel p-6">
+              <div className="section-label mb-2">Welcome Back</div>
+              <div className="text-2xl font-semibold text-slate-50">{username}</div>
+              <p className="mt-3 text-sm leading-6 text-slate-400">
+                This area now mirrors the reference direction: upload, workspace, and dashboard framing around the existing app behavior.
+              </p>
+            </div>
+
+            <div className="surface-panel p-6">
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <div className="section-label mb-2">Data Upload</div>
+                  <div className="text-xl font-semibold text-slate-100">Your datasets</div>
+                </div>
+                <div className="text-xs text-slate-400">{datasets.length} source{datasets.length === 1 ? "" : "s"}</div>
+              </div>
+              <div className="flex items-center gap-3 mb-4">
             <button
-              className="px-3 py-2 rounded-lg bg-accent text-slate-900 font-semibold shadow-card hover:brightness-95 disabled:opacity-60"
+              className="primary-button px-4 py-2.5 rounded-xl font-semibold disabled:opacity-60"
               disabled={uploading}
               onClick={() => document.getElementById("file-upload-input")?.click()}
             >
@@ -129,7 +182,7 @@ export default function Home() {
               {datasets.map((d) => (
                 <div
                   key={d.id}
-                  className="glass-card p-4 border border-white/10 hover:border-cyan-400/60 transition cursor-pointer"
+                  className="glass-card p-4 border border-white/10 hover:border-accent/50 transition cursor-pointer"
                   onClick={() => router.push(`/datasets/${d.id}`)}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -148,14 +201,40 @@ export default function Home() {
                       >
                         {deletingId === d.id ? "Deleting..." : "Delete"}
                       </button>
-                      <div className="text-sm text-cyan-300">Open →</div>
+                      <div className="text-sm text-accentSoft">Open →</div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
+            </div>
+          </section>
         </div>
+
+        <section className="mt-8 grid gap-6 lg:grid-cols-3">
+          <div className="surface-panel p-6">
+            <div className="section-label mb-3">AI Query Workspace</div>
+            <div className="text-xl font-semibold text-slate-50">Natural language to SQL</div>
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              The current chat-driven query workflow stays in place. The styling now aligns with a darker enterprise analytics shell.
+            </p>
+          </div>
+          <div className="surface-panel p-6">
+            <div className="section-label mb-3">System Dashboard</div>
+            <div className="text-xl font-semibold text-slate-50">Performance overview</div>
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              Adds the dashboard framing shown in the reference, while your backend query and preview features remain untouched.
+            </p>
+          </div>
+          <div className="surface-panel p-6">
+            <div className="section-label mb-3">Data Sources & Upload</div>
+            <div className="text-xl font-semibold text-slate-50">Spreadsheet intake</div>
+            <p className="mt-3 text-sm leading-6 text-slate-400">
+              CSV and Excel upload behavior is unchanged; only the visual treatment and page composition have been expanded.
+            </p>
+          </div>
+        </section>
       </div>
     </main>
   );

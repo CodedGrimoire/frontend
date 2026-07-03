@@ -33,11 +33,12 @@ export default function ChatPanel({
 
   return (
     <div className="h-full flex flex-col">
-      <div className="p-0 pb-3">
-        <h1 className="text-lg font-semibold text-cyan-400">DataPilot</h1>
-        <p className="text-xs text-slate-400">Your AI Data Assistant</p>
+      <div className="p-0 pb-4">
+        <div className="section-label mb-2">Natural Language Sheet Query</div>
+        <h1 className="text-xl font-semibold text-ink">DataPilot AI</h1>
+        <p className="text-xs text-muted">AI Query Workspace</p>
       </div>
-      <div className="text-sm text-slate-300 mb-3 leading-relaxed">
+      <div className="text-sm text-slate-300 mb-4 leading-relaxed">
         Hi, I'm DataPilot. Ask questions about your dataset and I’ll generate SQL and insights.
       </div>
       <div className="glass-card flex-1 overflow-y-auto p-4">
@@ -46,20 +47,20 @@ export default function ChatPanel({
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} items-start gap-3`}>
             {msg.role === "assistant" && (
-              <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-black font-bold text-sm">
+              <div className="w-8 h-8 rounded-full bg-accent text-slate-950 flex items-center justify-center font-bold text-sm shadow-card">
                 DP
               </div>
             )}
             <div
               className={`max-w-[85%] px-3 py-2.5 rounded-lg text-sm ${
                 msg.role === "user"
-                  ? "bg-slate-700 text-right text-slate-100 self-end"
-                  : "bg-slate-800 text-left text-slate-100 self-start"
+                  ? "bg-accentDeep/30 border border-accent/20 text-right text-slate-100 self-end"
+                  : "bg-slate-900/80 border border-line text-left text-slate-100 self-start"
               }`}
             >
               <div
                 className={`text-[11px] uppercase tracking-[0.1em] mb-1 font-semibold ${
-                  msg.role === "user" ? "text-slate-400" : "text-cyan-300"
+                  msg.role === "user" ? "text-accentSoft" : "text-accentSoft"
                 }`}
               >
                 {msg.role === "user" ? "YOU" : "DataPilot"}
@@ -85,7 +86,7 @@ export default function ChatPanel({
               <button
                 key={s}
                 onClick={() => onSelectSuggestion(s)}
-                className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-slate-100 hover:bg-cyan-500/20 transition"
+                className="px-3 py-1.5 rounded-full pill-button text-sm"
               >
                 {s}
               </button>
@@ -102,7 +103,7 @@ export default function ChatPanel({
           className="flex items-center gap-2 w-full"
         >
           <input
-            className="flex-1 min-w-0 px-3 py-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-slate-500"
+            className="flex-1 min-w-0 px-3 py-3 rounded-xl bg-slate-950/80 border border-line text-slate-100 focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-slate-500"
             placeholder="Ask DataPilot about your data..."
             value={input}
             onChange={(e) => onChange(e.target.value)}
@@ -111,7 +112,7 @@ export default function ChatPanel({
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="ask-button px-4 py-3 rounded-xl bg-accent text-slate-900 font-semibold shadow-card disabled:opacity-60 disabled:cursor-not-allowed transition whitespace-nowrap"
+            className="ask-button primary-button px-4 py-3 rounded-xl font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition whitespace-nowrap"
             style={{ width: "100px", minWidth: "90px", flexShrink: 0 }}
           >
             {loading ? "Asking…" : "Ask"}

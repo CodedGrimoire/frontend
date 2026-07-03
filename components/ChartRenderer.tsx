@@ -30,7 +30,7 @@ export default function ChartRenderer({ columns, rows }: Props) {
   // single scalar
   if (rows.length === 1 && columns.length === 1 && typeof rows[0][columns[0].name] === "number") {
     return (
-      <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+      <div className="glass-card p-4">
         <div className="text-sm text-slate-300 mb-1">Metric</div>
         <div className="text-3xl font-semibold text-slate-50">
           {Number(rows[0][columns[0].name]).toLocaleString()}
@@ -62,18 +62,18 @@ export default function ChartRenderer({ columns, rows }: Props) {
     const xKey = dateColumns[0].name;
     const yKey = numericColumns[0].name;
     return (
-      <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+      <div className="glass-card p-4">
         <div className="text-sm text-slate-300 mb-2">Trend</div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={rows as any[]}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#232945" />
               <XAxis dataKey={xKey} tick={{ fill: "#cbd5e1", fontSize: 12 }} />
               <YAxis tick={{ fill: "#cbd5e1", fontSize: 12 }} />
               <Tooltip
-                contentStyle={{ background: "#0f172a", border: "1px solid #1f2937", borderRadius: 8, color: "#e2e8f0" }}
+                contentStyle={{ background: "#0f1323", border: "1px solid #232945", borderRadius: 8, color: "#e2e8f0" }}
               />
-              <Line type="monotone" dataKey={yKey} stroke="#06b6d4" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey={yKey} stroke="#7c86ff" strokeWidth={2.5} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -86,18 +86,18 @@ export default function ChartRenderer({ columns, rows }: Props) {
     const xKey = categoryColumns[0].name;
     const yKey = numericColumns[0].name;
     return (
-      <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+      <div className="glass-card p-4">
         <div className="text-sm text-slate-300 mb-2">Data Visualization</div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={rows as any[]}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#232945" />
               <XAxis dataKey={xKey} tick={{ fill: "#cbd5e1", fontSize: 12 }} />
               <YAxis tick={{ fill: "#cbd5e1", fontSize: 12 }} />
               <Tooltip
-                contentStyle={{ background: "#0f172a", border: "1px solid #1f2937", borderRadius: 8, color: "#e2e8f0" }}
+                contentStyle={{ background: "#0f1323", border: "1px solid #232945", borderRadius: 8, color: "#e2e8f0" }}
               />
-              <Bar dataKey={yKey} fill="#06b6d4" radius={[6, 6, 0, 0]} />
+              <Bar dataKey={yKey} fill="#7c86ff" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

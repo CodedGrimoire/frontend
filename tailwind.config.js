@@ -7,12 +7,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        surface: "#0f172a",
-        card: "#111827",
-        accent: "#22d3ee"
+        surface: "#080b14",
+        card: "#121726",
+        accent: "#7c86ff",
+        accentSoft: "#aeb4ff",
+        accentDeep: "#5966f2",
+        ink: "#e8ebff",
+        muted: "#8f98bd",
+        line: "#232945"
       },
       boxShadow: {
-        card: "0 12px 30px rgba(0,0,0,0.25)"
+        card: "0 18px 48px rgba(4, 7, 18, 0.42)"
       }
     }
   },

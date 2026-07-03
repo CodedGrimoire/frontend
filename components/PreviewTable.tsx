@@ -43,7 +43,7 @@ export default function PreviewTable({
         <div className="flex items-center gap-2 mb-2 text-sm text-slate-200">
           <span>Filters:</span>
           {filterColumn && (
-            <div className="px-2 py-1 rounded-full bg-white/10 border border-white/15 flex items-center gap-2">
+            <div className="px-2 py-1 rounded-full bg-accent/10 border border-accent/15 flex items-center gap-2">
               <span>
                 {filterColumn} = {filterValue || "*"}
               </span>
@@ -60,7 +60,7 @@ export default function PreviewTable({
         <div className="flex items-center gap-2 mb-2 text-sm">
           <label className="text-slate-300">Filter:</label>
           <select
-            className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-100"
+            className="bg-slate-950/80 border border-line rounded px-2 py-1 text-slate-100"
             value={filterColumn || ""}
             onChange={(e) => onFilterChange(e.target.value, filterValue)}
           >
@@ -72,20 +72,20 @@ export default function PreviewTable({
             ))}
           </select>
           <input
-            className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-100 flex-1"
+            className="bg-slate-950/80 border border-line rounded px-2 py-1 text-slate-100 flex-1"
             placeholder="Contains…"
             value={filterValue}
             onChange={(e) => onFilterChange(filterColumn || "", e.target.value)}
           />
           <button
-            className="px-3 py-1 rounded border border-slate-700 text-slate-100 disabled:opacity-50"
+            className="px-3 py-1 rounded secondary-button disabled:opacity-50"
             disabled={!filterColumn}
             onClick={() => onFilterChange(filterColumn || "", filterValue)}
           >
             Apply
           </button>
           {onClearFilter && (
-            <button className="px-3 py-1 rounded border border-slate-700 text-slate-100" onClick={onClearFilter}>
+            <button className="px-3 py-1 rounded secondary-button" onClick={onClearFilter}>
               Clear
             </button>
           )}
@@ -98,10 +98,10 @@ export default function PreviewTable({
           <div className="p-4 text-slate-400 text-sm">No rows in dataset.</div>
         ) : (
           <table className="min-w-full text-xs text-left">
-            <thead className="sticky top-0 bg-slate-900/90 backdrop-blur z-10">
+            <thead className="sticky top-0 bg-slate-950/90 backdrop-blur z-10">
               <tr>
                 {columns.map((col) => (
-                  <th key={col.name} className="px-3 py-2 font-semibold text-slate-200 border-b border-slate-800">
+                  <th key={col.name} className="px-3 py-2 font-semibold text-slate-200 border-b border-line">
                     <div className="flex items-center gap-2">
                       <button className="flex items-center gap-1 text-slate-100" onClick={() => onSort && onSort(col.name)}>
                         <span>{col.name}</span>
@@ -112,7 +112,7 @@ export default function PreviewTable({
                         )}
                       </button>
                       <button
-                        className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 uppercase"
+                        className="text-[11px] px-2 py-0.5 rounded bg-accent/10 border border-accent/10 text-accentSoft uppercase"
                         onClick={() => onFilterChange && onFilterChange(col.name, filterValue)}
                       >
                         🔍
@@ -124,7 +124,7 @@ export default function PreviewTable({
             </thead>
             <tbody>
               {rows.map((row, idx) => (
-                <tr key={idx} className="border-b border-slate-800/60 last:border-0 hover:bg-white/5">
+                <tr key={idx} className="border-b border-line/70 last:border-0 hover:bg-white/[0.03]">
                   {columns.map((col) => (
                     <td key={col.name} className="px-3 py-2 text-slate-100">
                       {renderValue(row[col.name])}
@@ -139,7 +139,7 @@ export default function PreviewTable({
       {onPageChange && (
         <div className="flex items-center justify-center gap-4 mt-3 text-sm text-slate-200">
           <button
-            className="px-3 py-1 rounded border border-slate-700 disabled:opacity-50"
+            className="px-3 py-1 rounded secondary-button disabled:opacity-50"
             disabled={page <= 1 || loading}
             onClick={() => onPageChange(Math.max(1, page - 1))}
           >
@@ -149,7 +149,7 @@ export default function PreviewTable({
             Page {page} / {totalPages}
           </div>
           <button
-            className="px-3 py-1 rounded border border-slate-700 disabled:opacity-50"
+            className="px-3 py-1 rounded secondary-button disabled:opacity-50"
             disabled={page >= totalPages || loading}
             onClick={() => onPageChange(Math.min(totalPages, page + 1))}
           >

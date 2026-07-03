@@ -147,9 +147,36 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
 
   return (
     <main className="h-screen w-screen overflow-hidden bg-surface text-slate-100">
-      <div className="h-full flex">
+      <div className="h-full flex flex-col px-4 py-4 gap-4">
+        <header className="surface-panel soft-grid px-5 py-4 flex items-center justify-between gap-4 shrink-0">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/20 flex items-center justify-center text-accentSoft text-lg font-semibold">
+              DP
+            </div>
+            <div className="min-w-0">
+              <div className="section-label mb-1">Natural Language Sheet Query</div>
+              <div className="text-xl font-semibold text-slate-50 truncate">AI Query Workspace</div>
+            </div>
+          </div>
+          <div className="hidden xl:grid grid-cols-3 gap-3 min-w-[460px]">
+            <div className="glass-card px-4 py-3">
+              <div className="text-[11px] uppercase tracking-[0.14em] text-accentSoft">Module</div>
+              <div className="mt-1 text-sm text-slate-100">SQL Editor</div>
+            </div>
+            <div className="glass-card px-4 py-3">
+              <div className="text-[11px] uppercase tracking-[0.14em] text-accentSoft">Module</div>
+              <div className="mt-1 text-sm text-slate-100">Pipelines</div>
+            </div>
+            <div className="glass-card px-4 py-3">
+              <div className="text-[11px] uppercase tracking-[0.14em] text-accentSoft">Module</div>
+              <div className="mt-1 text-sm text-slate-100">Logs</div>
+            </div>
+          </div>
+        </header>
+
+        <div className="h-full flex gap-4 min-h-0">
         {/* Left: Chat */}
-        <section className="w-[20%] min-w-[260px] border-r border-slate-800 p-4 pt-10 flex flex-col">
+        <section className="w-[21%] min-w-[280px] surface-panel p-4 pt-6 flex flex-col">
           <ChatPanel
             messages={chatHistory}
             input={question}
@@ -166,7 +193,14 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
         </section>
 
         {/* Middle: Results */}
-        <section className="flex-1 border-r border-slate-800 p-4 pt-8 overflow-y-auto">
+        <section className="flex-1 surface-panel p-4 pt-6 overflow-y-auto">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <div className="section-label mb-1">Workspace</div>
+              <div className="text-xl font-semibold text-slate-50">Query results and generated SQL</div>
+            </div>
+            <div className="text-xs text-slate-400">Current dataset: {datasetId}</div>
+          </div>
           <div className="results-content">
             {error && (
               <div className="glass-card p-3 border border-rose-500/40 text-rose-100 text-sm">{error}</div>
@@ -189,7 +223,17 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
         </section>
 
         {/* Right: Spreadsheet */}
-        <section className="w-[45%] min-w-[420px] p-4 pt-8 overflow-x-auto">
+        <section className="w-[42%] min-w-[420px] surface-panel p-4 pt-6 overflow-x-auto">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <div className="section-label mb-1">Data Sources & Upload</div>
+              <div className="text-xl font-semibold text-slate-50">Spreadsheet preview</div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
+              <div className="glass-card px-3 py-2">Filters</div>
+              <div className="glass-card px-3 py-2">Sorting</div>
+            </div>
+          </div>
           {previewError ? (
             <div className="glass-card p-4 border border-rose-500/40 text-rose-100 text-sm">{previewError}</div>
           ) : (
@@ -226,6 +270,7 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
             />
           )}
         </section>
+        </div>
       </div>
     </main>
   );

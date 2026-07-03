@@ -22,13 +22,13 @@ export default function ResultTable({ columns, rows, loading }: Props) {
   return (
     <div className="glass-card overflow-x-auto">
       <table className="min-w-full text-sm text-left">
-        <thead className="bg-slate-900/60">
+        <thead className="bg-slate-950/60">
           <tr>
             {columns.map((col) => (
-              <th key={col.name} className="px-4 py-3 font-semibold text-slate-200 border-b border-slate-800">
+              <th key={col.name} className="px-4 py-3 font-semibold text-slate-200 border-b border-line">
                 <div className="flex items-center gap-2">
                   <span>{col.name}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 uppercase">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accentSoft uppercase border border-accent/15">
                     {col.type}
                   </span>
                 </div>
@@ -38,7 +38,7 @@ export default function ResultTable({ columns, rows, loading }: Props) {
         </thead>
         <tbody>
           {rows.map((row, idx) => (
-            <tr key={idx} className="border-b border-slate-800/60 last:border-0">
+            <tr key={idx} className="border-b border-line/70 last:border-0 hover:bg-white/[0.03]">
               {columns.map((col) => (
                 <td key={col.name} className="px-4 py-3 text-slate-100">
                   {renderValue(row[col.name])}
