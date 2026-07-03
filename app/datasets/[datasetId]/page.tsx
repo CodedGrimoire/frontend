@@ -7,6 +7,7 @@ import SQLViewer from "../../../components/SQLViewer";
 import ChatPanel from "../../../components/ChatPanel";
 import PreviewTable from "../../../components/PreviewTable";
 import ChartRenderer from "../../../components/ChartRenderer";
+import { apiFetch } from "../../../lib/api";
 
 type Column = { name: string; type: string };
 type QueryResult = {
@@ -29,9 +30,6 @@ type Preview = {
 type Suggestions = {
   suggestions: string[];
 };
-
-const API_HOST = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8100").replace(/\/$/, "");
-const DATASETS_BASE = `${API_HOST}/api/v1/datasets`;
 
 export default function DatasetPage({ params }: { params: { datasetId: string } }) {
   const datasetId = params.datasetId;
@@ -77,7 +75,7 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
           params.append("filter_column", previewFilterColumn);
           params.append("filter_value", previewFilterValue);
         }
-        const res = await fetch(`${DATASETS_BASE}/${datasetId}/rows?${params.toString()}`);
+        const res = await apiFetch(`/api/v1/datasets/${datasetId}/rows?${params.toString()}`, {}, false);
         if (!res.ok) throw new Error(`Preview failed (${res.status})`);
         const data = (await res.json()) as Preview;
         if (mounted) {
@@ -95,7 +93,7 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
     const loadSuggestions = async () => {
       if (!datasetId) return;
       try {
-        const res = await fetch(`${DATASETS_BASE}/${datasetId}/suggestions`);
+        const res = await apiFetch(`/api/v1/datasets/${datasetId}/suggestions`, {}, false);
         if (!res.ok) throw new Error(`Suggestions failed (${res.status})`);
         const data = (await res.json()) as Suggestions;
         if (mounted) setSuggestions(data.suggestions || []);
@@ -119,13 +117,13 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
     setChatHistory((prev) => [...prev, { role: "user", text: userMessage }]);
     setQuestion(""); // clear input immediately
     try {
-      const res = await fetch(`${DATASETS_BASE}/${datasetId}/query`, {
+      const res = await apiFetch(`/api/v1/datasets/${datasetId}/query`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ question: userMessage }),
-      });
+      }, false);
       if (!res.ok) {
         const detail = await res.json().catch(() => ({}));
         throw new Error(detail.detail || `Request failed (${res.status})`);
@@ -147,34 +145,7 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
 
   return (
     <main className="h-screen w-screen overflow-hidden bg-surface text-slate-100">
-      <div className="h-full flex flex-col px-4 py-4 gap-4">
-        <header className="surface-panel soft-grid px-5 py-4 flex items-center justify-between gap-4 shrink-0">
-          <div className="flex items-center gap-4 min-w-0">
-            <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/20 flex items-center justify-center text-accentSoft text-lg font-semibold">
-              DP
-            </div>
-            <div className="min-w-0">
-              <div className="section-label mb-1">Natural Language Sheet Query</div>
-              <div className="text-xl font-semibold text-slate-50 truncate">AI Query Workspace</div>
-            </div>
-          </div>
-          <div className="hidden xl:grid grid-cols-3 gap-3 min-w-[460px]">
-            <div className="glass-card px-4 py-3">
-              <div className="text-[11px] uppercase tracking-[0.14em] text-accentSoft">Module</div>
-              <div className="mt-1 text-sm text-slate-100">SQL Editor</div>
-            </div>
-            <div className="glass-card px-4 py-3">
-              <div className="text-[11px] uppercase tracking-[0.14em] text-accentSoft">Module</div>
-              <div className="mt-1 text-sm text-slate-100">Pipelines</div>
-            </div>
-            <div className="glass-card px-4 py-3">
-              <div className="text-[11px] uppercase tracking-[0.14em] text-accentSoft">Module</div>
-              <div className="mt-1 text-sm text-slate-100">Logs</div>
-            </div>
-          </div>
-        </header>
-
-        <div className="h-full flex gap-4 min-h-0">
+      <div className="h-full flex px-4 py-4 gap-4 min-h-0">
         {/* Left: Chat */}
         <section className="w-[21%] min-w-[280px] surface-panel p-4 pt-6 flex flex-col">
           <ChatPanel
@@ -270,7 +241,6 @@ export default function DatasetPage({ params }: { params: { datasetId: string } 
             />
           )}
         </section>
-        </div>
       </div>
     </main>
   );

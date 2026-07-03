@@ -1,13 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "../lib/api";
 
 type DatasetItem = { id: string; name: string; status: string };
-
-const API_HOST = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000").replace(/\/$/, "");
-const DATASETS_BASE = `${API_HOST}/api/v1/datasets`;
 
 export default function Home() {
   const router = useRouter();
@@ -16,13 +13,13 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const username = "User"; // placeholder; plug in auth user when available
   const [fileInputKey, setFileInputKey] = useState(Date.now()); // reset file input after use
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(DATASETS_BASE);
+        setLoading(true);
+        const res = await apiFetch("/api/v1/datasets", {}, false);
         if (!res.ok) throw new Error(`Failed to load datasets (${res.status})`);
         const data = (await res.json()) as DatasetItem[];
         setDatasets(data);
@@ -43,7 +40,7 @@ export default function Home() {
     setDeletingId(id);
     setError(null);
     try {
-      const res = await fetch(`${DATASETS_BASE}/${id}`, { method: "DELETE" });
+      const res = await apiFetch(`/api/v1/datasets/${id}`, { method: "DELETE" }, false);
       if (!res.ok) throw new Error(`Delete failed (${res.status})`);
       setDatasets((prev) => prev.filter((d) => d.id !== id));
     } catch (err) {
@@ -52,6 +49,7 @@ export default function Home() {
       setDeletingId(null);
     }
   };
+  const username = "User";
 
   return (
     <main className="min-h-screen bg-surface text-slate-100">
@@ -145,10 +143,10 @@ export default function Home() {
                 try {
                   const form = new FormData();
                   form.append("file", file);
-                  const res = await fetch(`${DATASETS_BASE}/upload`, {
+                  const res = await apiFetch("/api/v1/datasets/upload", {
                     method: "POST",
                     body: form,
-                  });
+                  }, false);
                   if (!res.ok) {
                     const detail = await res.json().catch(() => ({}));
                     throw new Error(detail.detail || `Upload failed (${res.status})`);
